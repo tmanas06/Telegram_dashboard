@@ -233,11 +233,3 @@ if selected == "Contact Us":
     st.markdown("For any queries or feedback, please contact us at: support@telegramtrends.xyz")
     st.markdown("You can also follow us on our social media channels for the latest updates.")
 
-    with st.expander("Contact us"):
-        with st.form(key='contact', clear_on_submit=True):
-            email = st.text_input('Contact Email')
-            message = st.text_area("Query", "Please fill in all the information or we may not be able to process your request")
-            submit_button = st.form_submit_button(label='Send Information')
-            if submit_button:
-                # Assuming send_email function is defined elsewhere
-                send_email(email, message)
