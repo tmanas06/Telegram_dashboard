@@ -3,71 +3,17 @@ import pandas as pd
 import plotly.express as px
 import duckdb
 from streamlit_option_menu import option_menu
+import matplotlib.pyplot as plt
+import numpy as np
 
-# Load custom CSS for futuristic styling
-def load_css():
-    st.markdown("""
-    <style>
-    body {
-        background-color: #0e0e0e;
-        color: #fff;
-        font-family: 'Roboto', sans-serif;
-    }
-    .sidebar .sidebar-content {
-        background-color: #1a1a1a;
-    }
-    .stButton>button {
-        background-color: #1f77b4;
-        color: white;
-        border-radius: 8px;
-        font-size: 16px;
-        padding: 8px 20px;
-    }
-    .stButton>button:hover {
-        background-color: #ff6600;
-        color: white;
-    }
-    .stTextInput>div>div>input {
-        background-color: #2b2b2b;
-        color: white;
-    }
-    .stMarkdown {
-        color: #8ab4f8;
-    }
-    .stDataFrame {
-        background-color: #1e1e1e;
-        color: white;
-    }
-    .st-expander>div>div>div {
-        background-color: #1e1e1e;
-    }
-    .stMetric {
-        background-color: #1e1e1e;
-        border-radius: 10px;
-        padding: 10px;
-    }
-    .plotly-chart {
-        background-color: #0e0e0e;
-    }
-    .css-1r6slb0 {
-        background-color: #1a1a1a;
-    }
-    .css-1adrfps {
-        background-color: #1a1a1a;
-    }
-    .css-v7itv9 {
-        background-color: #1a1a1a;
-    }
-    </style>
-    """, unsafe_allow_html=True)
 
-load_css()
+st.set_page_config(layout="wide")
 
 # Sidebar menu
 with st.sidebar:
     selected = option_menu(
         menu_title="Main Menu",
-        options=["Home", "Data Analysis", "Review", "Contact Us"],
+        options=["Home", "Data Analysis", "Sentiment Analysis", "Contact Us"],
         icons=["house", "bar-chart", "star", "envelope"],
         menu_icon="cast",
         default_index=0,
@@ -76,13 +22,22 @@ with st.sidebar:
 if selected == "Home":
     st.title("Telegram Dashboard")
     st.markdown("TelegramTrends v1")
-    t1, t2 = st.columns((0.09, 0.75))
 
-    t1.image('logo.png', width=160)
-    t2.title("Dashboard Data - Telegram Report")
-    t2.markdown("Website: **https://telegramtrends.xyz/**")
+    # Create a multi-column layout
+    col1, col2, col3 = st.columns([1, 6, 1])
 
-    st.header("Welcome to the Telegram Dashboard")
+    # Place the logo in the first column
+    # col1.image('logo.png', width=200)
+
+    # Place the markdown text in the middle column
+    with col2:
+        st.title("Dashboard Data - Telegram Report")
+        st.markdown("Website: **https://telegramtrends.xyz/**")
+
+    # Add a header line
+    st.markdown("---")
+
+    st.header("Welcome to the Dashboard Home Page")
     st.write("Use the sidebar to navigate to different sections of the dashboard.")
 
 if selected == "Data Analysis":
@@ -110,7 +65,7 @@ if selected == "Data Analysis":
         st.info("Uploaded files through config")
         df = load_data(uploaded_files)
         if df is not None:
-            st.dataframe(df.head())  # Display the first few rows of the dataframe
+            # st.dataframe(df.head())  # Display the first few rows of the dataframe
 
             with st.expander("Data Preview"):
                 st.write("Data preview is shown here")
@@ -153,8 +108,11 @@ if selected == "Data Analysis":
                 fig2.update_xaxes(range=[0, 600])
 
                 with st.container():
-                    st.plotly_chart(fig1)
-                    st.plotly_chart(fig2)
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.plotly_chart(fig1)
+                    with col2:
+                        st.plotly_chart(fig2)
 
             plot_message_lengths()
 
@@ -192,17 +150,22 @@ if selected == "Data Analysis":
             # Charts for Top Messages by Length
             st.subheader("Top Messages by Length")
             filtered_df = df[df['Sender Name'] != 'Unknown']
-            top_messages = filtered_df.assign(Message_Length=filtered_df['Message'].apply(lambda x: len(str(x)))).nlargest(5, 'Message_Length')[['Dialog ID', 'Dialog Name', 'Sender Name', 'Message', 'Message_Length']]
+            top_messages = filtered_df.assign(Message_Length=filtered_df['Message'].apply(lambda x: len(str(x)))).nlargest(6, 'Message_Length')[['Dialog ID', 'Dialog Name', 'Sender Name', 'Message', 'Message_Length']]
 
             with st.container():
-                fig_pie = px.pie(top_messages, names='Sender Name', values='Message_Length', title='Top 5 Messages by Length - Pie Chart', color_discrete_sequence=px.colors.cyclical.HSV)
-                st.plotly_chart(fig_pie)
+                st.title("Top 5 Messages by Length")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    fig_pie = px.pie(top_messages, names='Sender Name', values='Message_Length', title='Pie Chart')
+                    st.plotly_chart(fig_pie)
 
-                fig_line = px.line(top_messages, x='Sender Name', y='Message_Length', markers=True, title='Top 5 Messages by Length - Line Graph')
-                st.plotly_chart(fig_line)
+                with col2:
+                    fig_line = px.line(top_messages, x='Sender Name', y='Message_Length', markers=True, title='Line Graph')
+                    st.plotly_chart(fig_line)
 
-                fig_scatter = px.scatter(top_messages, x='Sender Name', y='Message_Length', size='Message_Length', color='Sender Name', title='Top 5 Messages by Length - Scatter Plot')
-                st.plotly_chart(fig_scatter)
+                with col3:
+                    fig_scatter = px.scatter(top_messages, x='Sender Name', y='Message_Length', size='Message_Length', color='Sender Name', title='Scatter Plot')
+                    st.plotly_chart(fig_scatter)
 
             # Convert 'Message' to string and calculate 'Message_Length'
             df['Message_Length'] = df['Message'].astype(str).apply(len)
@@ -211,21 +174,27 @@ if selected == "Data Analysis":
             grouped_messages = df.groupby('Sender Name')['Message_Length'].sum().reset_index()
 
             # Sort by 'Message_Length' in descending order and take the top 5
-            top_senders = grouped_messages.sort_values('Message_Length', ascending=False).head(5)
+            top_senders = grouped_messages.sort_values('Message_Length', ascending=False).head(6)
 
             color_palette = ['#2d9cdb', '#00ffff', '#ffd500']
 
             with st.container():
-                fig_pie = px.pie(top_senders, names='Sender Name', values='Message_Length', title='Top 5 Senders by Message Length - Pie Chart', color_discrete_sequence=color_palette)
-                st.plotly_chart(fig_pie)
+                st.title("Top 5 Senders by Message Length")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    fig_pie = px.pie(top_senders, names='Sender Name', values='Message_Length', title='Pie Chart', color_discrete_sequence=color_palette)
+                    st.plotly_chart(fig_pie)
+            
+                with col2:
+                    fig_line = px.line(top_senders, x='Sender Name', y='Message_Length', markers=True, title='Line Graph', color_discrete_sequence=color_palette)
+                    st.plotly_chart(fig_line)
+            
+                with col3:
+                    color_scale = [[0, '#2d9cdb'], [0.5, '#00b3ff'], [1, '#ffd500']]
+                    fig_scatter = px.scatter(top_senders, x='Sender Name', y='Message_Length', size='Message_Length', color='Sender Name', title='Scatter Plot', color_continuous_scale=color_scale)
+                    st.plotly_chart(fig_scatter)
 
-                fig_line = px.line(top_senders, x='Sender Name', y='Message_Length', markers=True, title='Top 5 Senders by Message Length - Line Graph', color_discrete_sequence=color_palette)
-                st.plotly_chart(fig_line)
-
-                color_scale = [[0, '#2d9cdb'], [0.5, '#00b3ff'], [1, '#ffd500']]
-
-                fig_scatter = px.scatter(top_senders, x='Sender Name', y='Message_Length', size='Message_Length', color='Sender Name', title='Top 5 Senders by Message Length - Scatter Plot', color_continuous_scale=color_scale)
-                st.plotly_chart(fig_scatter)
+# contact us page
 
 if selected == "Contact Us":
     st.title("Contact Us")
@@ -233,3 +202,28 @@ if selected == "Contact Us":
     st.markdown("For any queries or feedback, please contact us at: support@telegramtrends.xyz")
     st.markdown("You can also follow us on our social media channels for the latest updates.")
 
+# sentiment analysis page
+
+if selected == "Sentiment Analysis":
+    st.title("Sentiment Analysis")
+    
+    # File upload for sentiment analysis
+    uploaded_sentiment_file = st.file_uploader("Upload a file for sentiment analysis", type=["csv", "xlsx"])
+    
+    if uploaded_sentiment_file is not None:
+        sentiment_df = pd.read_csv(uploaded_sentiment_file)  # Assuming CSV format
+        # Perform sentiment analysis on sentiment_df
+        # You can use any sentiment analysis library or model here
+        
+        # Display the sentiment analysis results
+        st.subheader("Sentiment Analysis Results")
+        st.dataframe(sentiment_df.head())  # Display the first few rows of the sentiment analysis results
+        # Add more visualizations or metrics based on the sentiment analysis results
+        
+        # Example: Histogram of sentiment scores
+        if 'sentiment' in sentiment_df.columns:
+            fig_sentiment = px.histogram(sentiment_df, x="sentiment", nbins=50, labels={'sentiment':'Sentiment Score'})
+            fig_sentiment.update_layout(title_text='Sentiment Score Distribution', xaxis_title='Sentiment Score', yaxis_title='Count')
+            st.plotly_chart(fig_sentiment)
+    else:
+        st.info("Please upload a file to perform sentiment analysis.")
