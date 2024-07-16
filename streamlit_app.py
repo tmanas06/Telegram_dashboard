@@ -3,9 +3,6 @@ import pandas as pd
 import plotly.express as px
 import duckdb
 from streamlit_option_menu import option_menu
-import matplotlib.pyplot as plt
-import numpy as np
-
 
 st.set_page_config(layout="wide")
 
@@ -13,8 +10,8 @@ st.set_page_config(layout="wide")
 with st.sidebar:
     selected = option_menu(
         menu_title="Main Menu",
-        options=["Home", "Data Analysis", "Sentiment Analysis", "Contact Us"],
-        icons=["house", "bar-chart", "star", "envelope"],
+        options=["Home", "Data Analysis", "Twitter Analysis", "Contact Us"],
+        icons=["house", "bar-chart", "star", "envelope", "smile"],
         menu_icon="cast",
         default_index=0,
     )
@@ -23,22 +20,36 @@ if selected == "Home":
     st.title("Telegram Dashboard")
     st.markdown("TelegramTrends v1")
 
-    # Create a multi-column layout
-    col1, col2, col3 = st.columns([1, 6, 1])
-
-    # Place the logo in the first column
-    # col1.image('logo.png', width=200)
-
-    # Place the markdown text in the middle column
-    with col2:
-        st.title("Dashboard Data - Telegram Report")
-        st.markdown("Website: **https://telegramtrends.xyz/**")
+    # Place the markdown text directly in the main layout
+    st.title("Dashboard Data - Telegram Report")
+    st.markdown("Website: **https://telegramtrends.xyz/**")
 
     # Add a header line
     st.markdown("---")
 
     st.header("Welcome to the Dashboard Home Page")
     st.write("Use the sidebar to navigate to different sections of the dashboard.")
+
+    # Create a multi-column layout
+    col1, col2, col3 = st.columns([1, 6, 1])
+
+    # Place the logo in the first column
+    # col1.image('logo.png', width=200)
+elif selected == "Twitter Analysis":
+    st.title("Twitter Analysis")
+
+    # Path to the CSV file
+    csv_file_path = r"C:\Users\tmana\OneDrive\Desktop\Telegrams_Dashboard\Telegram_dashboard\Dashboard\TwExport_wallet_hunter_Posts.csv"
+    
+    # Read the CSV file
+    df = pd.read_csv(csv_file_path)
+    
+    # Display the DataFrame in the app
+    st.dataframe(df)
+
+    
+
+    
 
 if selected == "Data Analysis":
     st.title("Data Analysis")
@@ -87,7 +98,8 @@ if selected == "Data Analysis":
                 FROM df
                 """
                 message_data = duckdb.query(query).df()
-                st.dataframe(message_data)
+                fig = px.bar(message_data, y=["Total_Messages", "Avg_Message_Length"], title="Message Statistics")
+                st.plotly_chart(fig)
 
             plot_text_analysis()
 
@@ -123,7 +135,8 @@ if selected == "Data Analysis":
                 FROM df
                 """
                 word_count_data = duckdb.query(query).df()
-                st.dataframe(word_count_data)
+                fig = px.bar(word_count_data, y="Total_Words", title="Total Words in Messages")
+                st.plotly_chart(fig)
 
             plot_word_count()
 
@@ -195,35 +208,10 @@ if selected == "Data Analysis":
                     st.plotly_chart(fig_scatter)
 
 # contact us page
-
 if selected == "Contact Us":
     st.title("Contact Us")
     st.subheader("We'd love to hear from you!")
     st.markdown("For any queries or feedback, please contact us at: support@telegramtrends.xyz")
     st.markdown("You can also follow us on our social media channels for the latest updates.")
 
-# sentiment analysis page
-
-if selected == "Sentiment Analysis":
-    st.title("Sentiment Analysis")
-    
-    # File upload for sentiment analysis
-    uploaded_sentiment_file = st.file_uploader("Upload a file for sentiment analysis", type=["csv", "xlsx"])
-    
-    if uploaded_sentiment_file is not None:
-        sentiment_df = pd.read_csv(uploaded_sentiment_file)  # Assuming CSV format
-        # Perform sentiment analysis on sentiment_df
-        # You can use any sentiment analysis library or model here
-        
-        # Display the sentiment analysis results
-        st.subheader("Sentiment Analysis Results")
-        st.dataframe(sentiment_df.head())  # Display the first few rows of the sentiment analysis results
-        # Add more visualizations or metrics based on the sentiment analysis results
-        
-        # Example: Histogram of sentiment scores
-        if 'sentiment' in sentiment_df.columns:
-            fig_sentiment = px.histogram(sentiment_df, x="sentiment", nbins=50, labels={'sentiment':'Sentiment Score'})
-            fig_sentiment.update_layout(title_text='Sentiment Score Distribution', xaxis_title='Sentiment Score', yaxis_title='Count')
-            st.plotly_chart(fig_sentiment)
-    else:
-        st.info("Please upload a file to perform sentiment analysis.")
+#
