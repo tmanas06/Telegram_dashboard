@@ -63,15 +63,6 @@ This Streamlit application provides an interactive dashboard to analyze Telegram
 - **Top Messages by Length**: Visualize top messages by length using pie charts, line graphs, and scatter plots.
 - **Top Senders by Message Length**: Visualize top senders by message length using pie charts, line graphs, and scatter plots.
 
-## Contact Us
-
-For any queries or feedback, please contact us at: [support@telegramtrends.xyz](mailto:support@telegramtrends.xyz)
-
-Follow us on our social media channels for the latest updates.
-
-## License
-
-This project is licensed under the MIT License.
 
 ## Acknowledgements
 
@@ -80,3 +71,14 @@ This project is licensed under the MIT License.
 - [Plotly](https://plotly.com/)
 - [DuckDB](https://duckdb.org/)
 - [Streamlit Option Menu](https://github.com/victoryhb/streamlit-option-menu)
+
+## Input
+![image](https://github.com/user-attachments/assets/543c6b73-17cd-4028-a6ff-aa41ed9ed181)
+
+## Output
+![image](https://github.com/user-attachments/assets/2b59034e-a638-415b-8a16-fd4562f8dc35)
+![image](https://github.com/user-attachments/assets/659e5c56-11fb-46fa-96bf-34f63e7fabc2)
+![image](https://github.com/user-attachments/assets/0846f48f-3e98-4ffb-aacb-da0d47a47dbe)
+![image](https://github.com/user-attachments/assets/44fe1e58-349f-4c7c-826c-c7ee608420d3)
+![image](https://github.com/user-attachments/assets/bd5b0757-88b7-4050-8e2d-beebf6de1e30)
+
