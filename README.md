@@ -40,13 +40,6 @@ This Streamlit application provides an interactive dashboard to analyze Telegram
     pip install -r requirements.txt
     ```
 
-4. Create a `.env` file in the root directory with your Telegram API credentials:
-    ```env
-    api_id=YOUR_API_ID
-    api_hash=YOUR_API_HASH
-    username=YOUR_TELEGRAM_USERNAME
-    ```
-
 ## Usage
 
 1. Run the Streamlit app:
